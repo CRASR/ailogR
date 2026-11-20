@@ -1,0 +1,2 @@
+date,tool_id,research_stage,task,ai_role,error_visibility,human_decisions,how_checked,evidence,prompt_archive,data_shared,outcome,logged_when,logged_by
+"2026-11-20","claude-opus-5.5","software","Design and write the ailogR package: logging, editing, checks, statement, AI instructions, vignettes","assistance","checkable","","23 testthat tests pass; interactive prompts dry-run with scripted answers; R CMD check","R/; tests/; vignettes/","","none","pending","at_the_time","ai"

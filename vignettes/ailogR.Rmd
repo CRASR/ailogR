@@ -1,0 +1,130 @@
+---
+title: "Getting started with ailogR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with ailogR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+ailogR logs AI use one task at a time. Entries go in two CSV files in an
+`ai-use/` folder: `ai_log.csv`, one row per task, and `ai_tools.csv`, one
+row per tool and model version.
+
+```{r}
+library(ailogR)
+project <- file.path(tempdir(), "stream-temperature")
+create_ai_log(project)
+```
+
+Here `project` is a temporary folder; in your own work, run
+`create_ai_log()` from the project's root.
+
+## Logging in the console
+
+Most of the time you run `log_ai()` with no arguments at the end of a work
+session. It asks up to six questions, listing the tool and research stage you
+used last as option 1:
+
+```
+> log_ai()
+AI tool:
+1: claude-opus-5.5
+2: Add a new tool
+Selection: 1
+Research stage:
+1: software
+2: conceptualization
+...
+Selection: 1
+Task, in one line: Function to import HOBO logger files
+If the AI output were subtly wrong, would that show?
+1: obvious: you can read and judge all of it (text edits, comments)
+2: checkable: a wrong output would fail or look wrong (plots, file import)
+3: silent: a wrong output would still run and look plausible (joins, models, unit conversions)
+Selection: 2
+How did you check it, and what did it show? Ran on 3 real files; errors on a malformed one
+What did you decide or change? Chose column names and time zone handling
+Logged row 1: Function to import HOBO logger files (checkable, accepted).
+```
+
+The question about how you checked it is skipped for `obvious` uses. The
+first time, choose "Add a new tool" and answer four questions about the
+tool. `vignette("what-to-log")` explains when to log and how to choose
+between `obvious`, `checkable` and `silent`.
+
+## Logging with arguments
+
+Every question is also an argument, which is how scripts and AI tools log:
+
+```{r}
+add_ai_tool("Claude", "Anthropic", "Opus 5.5", access_mode = "web", path = project)
+
+log_ai("Function to import HOBO logger files",
+       tool_id = "claude-opus-5.5", research_stage = "software",
+       error_visibility = "checkable",
+       how_checked = "Ran on 3 real files; errors on a malformed one",
+       human_decisions = "Chose column names and time zone handling",
+       path = project)
+
+log_ai("Convert logger pressure to water depth",
+       tool_id = "claude-opus-5.5", research_stage = "data_curation",
+       error_visibility = "silent",
+       how_checked = "Matched staff gauge readings within 1 cm on 12 visits",
+       human_decisions = "Chose the barometric correction and water density",
+       evidence = "R/depth.R; tests/test-depth.R",
+       path = project)
+```
+
+An entry with a missing or invalid field is not saved, and the error says
+which field to fix.
+
+## Checking and editing
+
+```{r}
+check_ai_log(project)
+```
+
+To change an entry, give its row number and the new values. Run
+interactively with no values, `edit_ai_log()` lets you pick the entry and
+the fields.
+
+```{r}
+edit_ai_log(2, outcome = "modified", path = project)
+```
+
+## Drafting a statement
+
+```{r}
+draft_ai_statement(project)
+```
+
+The draft is a starting point: edit it to say what matters for your work and
+fill in the bracketed text.
+
+## Using AI as a method
+
+If AI itself produced data or results, such as extracting values from papers
+or classifying images, log it with `ai_role = "method"`. Those entries also
+need `how_checked` and `prompt_archive`, and the statement describes them
+separately. Archive enough for someone else to repeat the work: the prompts,
+the model version and settings, and the inputs.
+
+```{r}
+log_ai("Extract litter mass loss and incubation days from 120 papers",
+       tool_id = "claude-opus-5.5", research_stage = "data_curation",
+       ai_role = "method", error_visibility = "silent",
+       how_checked = "Compared with hand extraction for 30 papers: 2 of 410 values differed",
+       prompt_archive = "extraction/prompts/",
+       human_decisions = "Defined the fields and the rules for ambiguous tables",
+       path = project)
+```
+
+## Letting AI tools draft entries
+
+AI tools can draft entries for you to review; see
+`vignette("ai-drafted-entries")`.

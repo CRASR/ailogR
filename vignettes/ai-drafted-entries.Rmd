@@ -1,0 +1,84 @@
+---
+title: "Letting AI tools draft entries"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Letting AI tools draft entries}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+The AI tool you worked with knows what it just did, so it can draft the log
+entry. You then review the draft, which is faster than writing it. Drafted
+entries are saved with outcome `pending`, are left out of AI-use statements,
+and are flagged by `check_ai_log()` until you review them.
+
+`create_ai_log()` puts the instructions for AI tools in
+`ai-use/AI-INSTRUCTIONS.md`. They say when to draft an entry, how to choose
+`error_visibility`, to record only checks actually run, and to leave
+`human_decisions` for you.
+
+## Coding agents
+
+Agents that run commands in your project (Claude Code, GitHub Copilot's
+agent, Codex and similar) log directly with `Rscript`. Point them to the
+instructions from the file they read at the start of each session, such as
+`CLAUDE.md` or `AGENTS.md`:
+
+```markdown
+At the end of each work session, follow ai-use/AI-INSTRUCTIONS.md.
+```
+
+## Chat apps
+
+Chat apps such as Claude or ChatGPT on the web or desktop usually can't
+write to your project. Instead, the instructions ask them to end the session
+with an R call for you to paste. Add the contents of
+`ai-use/AI-INSTRUCTIONS.md` to the app's custom instructions (or a Claude
+Project's instructions), or paste it into the chat when you want an entry.
+The app then replies with something like:
+
+```r
+ailogR::add_ai_tool("Claude", "Anthropic", "Opus 5.5", "web")
+ailogR::log_ai(
+  task = "Bayesian model for reservoir drought vulnerability in brms",
+  tool_id = "claude-opus-5.5", research_stage = "data_analysis",
+  error_visibility = "silent",
+  how_checked = "none",
+  logged_by = "ai")
+```
+
+`add_ai_tool()` does nothing if the tool is already listed.
+
+## Reviewing drafts
+
+```{r}
+library(ailogR)
+project <- file.path(tempdir(), "drafts")
+create_ai_log(project)
+add_ai_tool("Claude", "Anthropic", "Opus 5.5", "cli_agent", path = project)
+log_ai("Join gauge and chemistry tables by site and date",
+       tool_id = "claude-opus-5.5", research_stage = "data_curation",
+       error_visibility = "silent",
+       how_checked = "Row counts before and after the join match",
+       evidence = "R/join_sites.R", logged_by = "ai", path = project)
+check_ai_log(project)
+```
+
+Interactively, `edit_ai_log()` lists drafts first. For each, it shows what
+the tool recorded, asks what you decided and the outcome, and then lets you
+correct any field, such as an `error_visibility` you disagree with or a
+check you want to add. With arguments:
+
+```{r}
+edit_ai_log(1,
+            human_decisions = "Chose to keep unmatched dates as NA",
+            how_checked = "Row counts match; checked 20 joined rows against the raw files",
+            outcome = "modified", path = project)
+```
+
+The entry keeps `logged_by = "ai"`, so the log shows it was drafted by an AI
+tool and reviewed by a person.

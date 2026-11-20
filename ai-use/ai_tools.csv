@@ -1,0 +1,2 @@
+tool_id,product,provider,model_version,access_mode,trains_on_inputs,notes
+"claude-opus-5.5","Claude","Anthropic","Opus 5.5","web","unknown",""

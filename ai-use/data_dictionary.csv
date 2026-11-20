@@ -1,0 +1,22 @@
+table,field,required,allowed_values,description
+ai_log,date,yes,YYYY-MM-DD,Date of the work session
+ai_log,tool_id,yes,a tool_id from ai_tools.csv,AI tool used
+ai_log,research_stage,yes,conceptualization|methodology|information_collection|data_collection_method|execution|data_curation|data_analysis|software|privacy_security|interpretation|visualization|writing_original_draft|writing_review_editing|writing_translation|project_administration,"Research stage, using the AID Framework headings plus software and writing_original_draft from CRediT"
+ai_log,task,yes,,"What AI was used for, in one line"
+ai_log,ai_role,yes,assistance|method,"assistance: AI helped a person write code, text or ideas. method: AI itself produced data or results, such as extracting, classifying, coding or generating them"
+ai_log,error_visibility,yes,obvious|checkable|silent,"If the AI output were subtly wrong, would that show? obvious: you can read and judge all of it. checkable: a wrong output would fail, error or look wrong. silent: a wrong output would still run and look plausible"
+ai_log,human_decisions,"yes, unless outcome is pending",,"What a person decided, designed or changed"
+ai_log,how_checked,"if checkable, silent or method",,"The check you ran and what it showed, such as tests, simulated data with known answers, or comparison with a hand calculation"
+ai_log,evidence,no,,"Commit, file, test or other record of the work"
+ai_log,prompt_archive,if method,,Where the prompts and settings are archived (file path or URL)
+ai_log,data_shared,yes,none|public|unpublished|confidential,Most sensitive material given to the AI tool
+ai_log,outcome,yes,accepted|modified|rejected|pending,What happened to the AI output; pending until a person reviews an entry drafted by AI
+ai_log,logged_when,yes,at_the_time|reconstructed,Whether the entry was written at the time or reconstructed later
+ai_log,logged_by,yes,person|ai,Whether a person or an AI tool wrote the entry
+ai_tools,tool_id,yes,unique,Short key used in ai_log.csv; make a new one when the model version changes
+ai_tools,product,yes,,"Product name, such as Claude or ChatGPT"
+ai_tools,provider,yes,,Company or organization providing the tool
+ai_tools,model_version,yes,,Model name and version as shown by the tool
+ai_tools,access_mode,yes,web|desktop|api|ide|cli_agent,How the tool was accessed
+ai_tools,trains_on_inputs,no,yes|no|unknown,Whether the provider may train on your inputs under your account settings
+ai_tools,notes,no,,

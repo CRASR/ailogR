@@ -1,0 +1,93 @@
+---
+title: "What to log, and how much"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{What to log, and how much}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+ailogR answers two questions separately: whether a use of AI belongs in the
+log at all, and how much detail an entry needs.
+
+## Whether to log
+
+Resnik and Hosseini (2025) distinguish mandatory, optional and unnecessary
+disclosure of AI use, and argue that disclosure should be mandatory only when
+AI use is "intentional and substantial". ailogR applies that test to the log.
+Log a use when:
+
+- its output stays in the work (code, text, data, references, figures), or it
+  shaped a decision you adopted, such as a model structure or a design
+  choice; and
+- an error in it could change your results or claims.
+
+Log one entry per task per work session, not one per prompt. A long coding
+session on one function is one entry.
+
+Don't log:
+
+- autocomplete, spell-check, or searches you could have done in a search
+  engine;
+- explanations, where you then wrote the code or text yourself;
+- questions you asked to learn something;
+- brainstorming you discarded.
+
+## How much detail: error visibility
+
+Each entry records one judgment: **if the AI output were subtly wrong, would
+that show?** You answer from the task itself, before checking anything.
+
+| Level | A wrong output would... | Examples | Entry needs |
+|---|---|---|---|
+| `obvious` | be visible to anyone reading all of it | Copy-editing, a translation you can read, code comments, renaming variables | Task and what you decided |
+| `checkable` | fail, error, or look wrong | Plotting code, file import, functions with tests, finding references that you then read | Also how you checked it |
+| `silent` | still run and look plausible | Joins, unit conversions, aggregations, derived variables, QA/QC rules, model code (likelihoods, priors, link functions), reported calculations | Also how you checked it, with its result; link the evidence |
+
+Three rules for choosing:
+
+1. **Choose from the task, not from how well you checked it.** A join with
+   excellent tests is still `silent`; the tests are what goes in
+   `how_checked`.
+2. **When unsure, choose the less visible level.**
+3. **If one session spans several levels, use the least visible one**, or
+   split it into separate entries.
+
+For `silent` uses, a check has to be one that could catch a plausible but
+wrong answer. Rerunning the same code doesn't. Checks that can include:
+
+- simulating data with known parameters and recovering them;
+- comparing with a hand calculation or an independent implementation;
+- tests with known answers, including edge cases;
+- matching against independent measurements, such as staff gauge readings.
+
+A `silent` use logged with `how_checked = "none"` is flagged by
+`check_ai_log()`.
+
+### Where the levels come from
+
+The three levels are a convention of this package, not a published
+standard. They rest on a point made in the literature on errors in
+scientific software: code that crashes or gives an obviously implausible
+result is much less of a concern than errors that run, propagate downstream,
+and get reported (Soergel 2015). Soergel's paper is an opinion piece that
+estimates rather than measures how often this happens.
+
+## AI as a method
+
+Most entries record AI assisting a person (`ai_role = "assistance"`). When AI
+itself produces data or results, such as extracting values, classifying text
+or images, or coding interviews, it is part of the method and needs to be
+reported like one: the model version, prompts and settings, and how its
+output was validated. Those entries require `how_checked` and
+`prompt_archive`, and are almost always `silent`.
+
+## References
+
+- Resnik, D. B. & Hosseini, M. (2025). Disclosing artificial intelligence
+  use in scientific research and publication: When should disclosure be
+  mandatory, optional, or unnecessary? *Accountability in Research*.
+  https://doi.org/10.1080/08989621.2025.2481949
+- Soergel, D. A. W. (2015). Rampant software errors may undermine scientific
+  results. *F1000Research* 3: 303.
+  https://doi.org/10.12688/f1000research.5930.2
