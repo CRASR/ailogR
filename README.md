@@ -1,5 +1,7 @@
 # ailogR <img src="man/figures/logo.png" align="right" height="300" alt="ailogR hex sticker" />
 
+This package is still in alpha testing, but feel free to try it out and add bugs or suggest features in [Issues](https://github.com/CRASR/ailogR/issues)!
+
 ailogR logs AI use in research one task at a time, quickly enough to do at
 the end of every work session. Each entry is a row in a plain CSV file in the
 project's `ai-use/` folder.
